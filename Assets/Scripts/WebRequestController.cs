@@ -7,6 +7,14 @@ using Newtonsoft.Json;
 using System.Linq;
 using System.Globalization;
 using System;
+using UnityEngine.Events;
+
+/// <summary>
+/// ChangeWeatherEvent is listened by VirtualWeather class
+/// To use this event it needs to added VirtualWeather game object in the game objects hierarchy 
+/// to the inspector of OnChangeWeatherEvent on WebRequestAPI game object
+/// </summary>
+[System.Serializable] public class ChangeWeatherEvent : UnityEvent<string, string, int> { }
 
 public class WebRequestController : Singleton<WebRequestController>
 {
@@ -15,26 +23,35 @@ public class WebRequestController : Singleton<WebRequestController>
     private static string par_humidity = "relativehumidity_2m";
     private static string par_wcode = "weathercode";
     private static string par_cloud = "cloudcover";
-    private string urlOpenMeteo = "https://api.open-meteo.com/v1/forecast?latitude=41.80&longitude=-6.77&hourly="+par_temperature+","+par_humidity+","+par_wcode+","+par_cloud;
+    private static string par_radiation = "shortwave_radiation";
+    private static string par_wind = "windspeed_10m";
+    private static string par_soil_temperature = "soil_temperature_0cm";
+    private static string par_soil_moisture = "soil_moisture_0_1cm";
+    private string urlOpenMeteo = "https://api.open-meteo.com/v1/forecast?latitude=41.80&longitude=-6.77&hourly="+par_temperature+","+par_humidity+","+par_wcode+","+par_cloud+","+par_radiation+","+par_wind+","+par_soil_temperature+","+par_soil_moisture;
 	private OpenMateo.Root myDeserializedClass = null;
     private Dictionary<Code, string> WeatherStates =  null;
     private enum Code { Zero = 0, One = 1, Two = 2, Three = 3,  FortyFive = 45, FortyEight = 48,  FiftyOne = 51, FiftyThree = 53, FiftyFive = 55, FiftySix = 56, FiftySeven = 57, SixtyOne = 61, SixtyThree = 63, SixtyFive = 65, SixtySix = 66, SixtySeven = 67, SeventyOne = 71,  SeventyThree = 73,  SeventyFive = 75, SeventySeven = 77, Eighty = 80, EightyOne = 81, EightyTwo = 82, EightyFive = 85, EightySix = 86, NinetyFive = 95, NinetySix = 96, NinetyNine= 99 };
-    
+    public ChangeWeatherEvent OnChangeWeatherEvent;
+
+    /// <summary>
+    /// WeatherDescription is a list containing the description of WMO Weather interpretation codes (WW)
+    /// translated to portuguese from https://open-meteo.com/en/docs
+    /// </summary>
     private List<string> WeatherDescription = new List<string>()
     {
         "Céu limpo", //0
         "Parcialmente nublado e encoberto", //1
         "Nevoeiro e geada", //2
-        "Garoa: Intensidade leve ou moderada", //3
-        "Garoa Congelante: intensidade leve e densa", //4
-        "Chuva: Intensidade leve, moderada e forte", //5
-        "Chuva Congelante: Intensidade leve e forte", //6
-        "Queda de neve: intensidade leve ou moderada", //7
+        "Garoa", //3
+        "Garoa Congelante", //4
+        "Chuva", //5
+        "Chuva Congelante", //6
+        "Queda de neve", //7
         "Grãos de neve", //8
-        "Pancadas de chuva: leves, moderadas e violentas", //9
-        "Aguaceiros de neve leves e pesados", //10
-        "Trovoada: leve ou moderada", //11
-        "Trovoada com granizo leve e forte" //12
+        "Pancadas de chuva", //9
+        "Aguaceiros de neve", //10
+        "Trovoada", //11
+        "Trovoada com granizo" //12
     };
 
     private void InitWeatherStates()
@@ -128,16 +145,22 @@ public class WebRequestController : Singleton<WebRequestController>
                 var humidity = myDeserializedClass.hourly.relativehumidity_2m.ElementAt(i);
                 var weathercode = myDeserializedClass.hourly.weathercode.ElementAt(i);
                 var cloud = myDeserializedClass.hourly.cloudcover.ElementAt(i);
+                var wind = myDeserializedClass.hourly.windspeed_10m.ElementAt(i);
+                var radiation = myDeserializedClass.hourly.shortwave_radiation.ElementAt(i);
+                var soilTemp = myDeserializedClass.hourly.soil_temperature_0cm.ElementAt(i);
+                var soilHum = myDeserializedClass.hourly.soil_moisture_0_1cm.ElementAt(i);
 
-                Debug.Log("Date: " + dateHour[0] + " Hour: " + dateHour[1] + " Temp: " + temp + " Rain: " + humidity + " Cloud: " + cloud + " weather_code: " + weathercode);//+ "ºC");
+                //Debug.Log("Date: " + dateHour[0] + " Hour: " + dateHour[1] + " Temp: " + temp + " Rain: " + humidity + " Cloud: " + cloud + " weather_code: " + weathercode);//+ "ºC");
                 //Debug.Log("Agora são: " + currentHour + " datahour: " + dateHour[1]);
 
                 currentHour += ":00";
                 if (currentHour == dateHour[1])
                 {
+                    string currentWeather = SearchWeatherStateByCode(weathercode);
                     //Debug.Log("Agora são: " + currentHour);
-                    Debug.Log("Date: " + dateHour[0] + " Hour: " + dateHour[1] + " Temp: " + temp + " Rain: " + humidity + " Cloud: " + cloud + " weather_code: " + weathercode);//+ "ºC");     
-                    UIManager.instance.UpdateWeatherUI(temp.ToString()+"ºC", humidity.ToString(), SearchWeatherStateByCode(weathercode));
+                    //Debug.Log("Date: " + dateHour[0] + " Hour: " + dateHour[1] + " Temp: " + temp + " Rain: " + humidity + " Cloud: " + cloud + " weather_code: " + weathercode);//+ "ºC");     
+                    UIManager.instance.UpdateWeatherUI(temp.ToString()+"ºC", humidity.ToString()+ "%", currentWeather, wind.ToString()+"Km/h", radiation.ToString()+"W/m2", soilTemp.ToString()+"ºC", soilHum.ToString()+"m3/m3");
+                    OnChangeWeatherEvent.Invoke(dateHour[1], currentWeather, weathercode);
                 }
             }
 
@@ -162,8 +185,9 @@ public class WebRequestController : Singleton<WebRequestController>
     public void SearchWeatherAPI(string latitude, string longitude)
     {
         //Debug.Log("Lat: " + latitude + " Long: " + longitude);
-        urlOpenMeteo = "https://api.open-meteo.com/v1/forecast?latitude="+latitude+"&longitude="+longitude+"&hourly="+par_temperature+","+par_humidity+","+par_wcode+","+par_cloud;
+        urlOpenMeteo = "https://api.open-meteo.com/v1/forecast?latitude="+latitude+"&longitude="+longitude+"&hourly="+par_temperature+","+par_humidity+","+par_wcode+","+par_cloud+","+par_radiation+","+par_wind+","+par_soil_temperature+","+par_soil_moisture;
         StartCoroutine(GetFromOpenMateoAPI(urlOpenMeteo));
+    
     }
 }
 

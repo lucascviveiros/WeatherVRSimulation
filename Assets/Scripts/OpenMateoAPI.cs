@@ -14,6 +14,11 @@ public class OpenMateo
         public List<double> rain { get; set; }
         public List<int> weathercode { get; set; }
         public List<int> cloudcover { get; set; }
+        public List<double> windspeed_10m { get; set; }
+        public List<int> winddirection_10m { get; set; }
+        public List<double> soil_temperature_0cm { get; set; }
+        public List<double> soil_moisture_0_1cm { get; set; }
+        public List<double> shortwave_radiation { get; set; }
     }
 
     public class HourlyUnits
@@ -24,6 +29,11 @@ public class OpenMateo
         public string relativehumidity_2m { get; set; }
         public string weathercode { get; set; }
         public string cloudcover { get; set; }
+        public string windspeed_10m { get; set; }
+        public string winddirection_10m { get; set; }
+        public string soil_temperature_0cm { get; set; }
+        public string soil_moisture_0_1cm { get; set; }
+        public string shortwave_radiation { get; set; }
     }
 
     public class Root

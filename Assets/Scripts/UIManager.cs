@@ -8,9 +8,7 @@ public class UIManager : Singleton<UIManager>
 {
     [SerializeField] private TMPro.TMP_Dropdown m_Dropdown;
     private List<Region> listRegion = null;
-    private TextMeshProUGUI t_Temperatura;
-    private TextMeshProUGUI t_Humidade;
-    private TextMeshProUGUI t_Tempo;
+    private TextMeshProUGUI t_Temperatura, t_Humidade, t_Tempo, t_Vento, t_Radiacao, t_TempSolo, t_HumSolo;
 
     private void Awake()
     {
@@ -18,9 +16,14 @@ public class UIManager : Singleton<UIManager>
         listRegion = new List<Region>();
         PopulateRegion();
         //Finding UI Texts in Canvas
-        t_Temperatura = GameObject.Find("TextTemperaturaInput").GetComponent<TextMeshProUGUI>();
-        t_Humidade = GameObject.Find("TextHumidadeInput").GetComponent<TextMeshProUGUI>();
-        t_Tempo = GameObject.Find("TextTempoInput").GetComponent<TextMeshProUGUI>();
+        t_Temperatura = GameObject.Find("Values/TextTemperaturaInput").GetComponent<TextMeshProUGUI>();
+        t_Humidade = GameObject.Find("Values/TextHumidadeInput").GetComponent<TextMeshProUGUI>();
+        t_Tempo = GameObject.Find("Values/TextTempoInput").GetComponent<TextMeshProUGUI>();
+        t_Vento = GameObject.Find("Values/TextVentoInput").GetComponent<TextMeshProUGUI>();
+        t_Radiacao = GameObject.Find("Values/TextRadiacaoInput").GetComponent<TextMeshProUGUI>();
+        t_TempSolo = GameObject.Find("Values/TextTempSoloInput").GetComponent<TextMeshProUGUI>();
+        t_HumSolo = GameObject.Find("Values/TextHumSolo").GetComponent<TextMeshProUGUI>();
+
         //Finding UI Dropdown in Canvas
         m_Dropdown = GameObject.Find("Canvas/PanelRight/Dropdown").GetComponent<TMPro.TMP_Dropdown>(); 
         m_Dropdown.options.Clear();
@@ -78,10 +81,14 @@ public class UIManager : Singleton<UIManager>
     }
 
     //Used to update weather parameters in the UI Text in the Canvas from WebRequestController
-    public void UpdateWeatherUI(string temp, string hum, string tempo)
+    public void UpdateWeatherUI(string temp, string hum, string tempo, string vento, string radiacao, string tempSolo, string humSolo)
     {
         t_Temperatura.text = temp;
         t_Humidade.text = hum;
         t_Tempo.text = tempo;
+        t_Vento.text = vento;
+        t_Radiacao.text = radiacao;
+        t_TempSolo.text = tempSolo;
+        t_HumSolo.text = humSolo;
     }
 }
