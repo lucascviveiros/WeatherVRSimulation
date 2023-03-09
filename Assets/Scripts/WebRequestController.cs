@@ -140,7 +140,6 @@ public class WebRequestController : Singleton<WebRequestController>
             if (customDate == dateHour[0].Replace('-', '/'))
             {
                 var temp = myDeserializedClass.hourly.temperature_2m.ElementAt(i);
-                //var rain = myDeserializedClass.hourly.rain.ElementAt(count);
                 var humidity = myDeserializedClass.hourly.relativehumidity_2m.ElementAt(i);
                 var weathercode = myDeserializedClass.hourly.weathercode.ElementAt(i);
                 var cloud = myDeserializedClass.hourly.cloudcover.ElementAt(i);
@@ -159,9 +158,7 @@ public class WebRequestController : Singleton<WebRequestController>
                     //Debug.Log("Agora são: " + currentHour);
                     //Debug.Log("Date: " + dateHour[0] + " Hour: " + dateHour[1] + " Temp: " + temp + " Rain: " + humidity + " Cloud: " + cloud + " weather_code: " + weathercode);//+ "ºC");     
                     UIManager.instance.UpdateWeatherUI(temp.ToString()+"ºC", humidity.ToString()+ "%", currentWeather, wind.ToString()+"Km/h", radiation.ToString()+"W/m2", soilTemp.ToString()+"ºC", soilHum.ToString()+"m3/m3");
-                    //OnChangeWeatherEvent.Invoke(dateHour[1], currentWeather, weathercode);//, wind); //Listened by VirtualWeather
                     OnChangeWeatherEvent.Invoke(currentWeather, weathercode, wind, radiation); //Listened by VirtualWeather
-
                 }
             }
 
