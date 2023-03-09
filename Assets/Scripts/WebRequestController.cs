@@ -14,8 +14,6 @@ using UnityEngine.Events;
 /// To use this event it needs to added VirtualWeather game object in the game objects hierarchy 
 /// to the inspector of OnChangeWeatherEvent on WebRequestAPI game object
 /// </summary>
-//[System.Serializable] public class ChangeWeatherEvent : UnityEvent<string, string, int> { }
-
 [System.Serializable] public class ChangeWeatherEvent : UnityEvent<string, int, double, double> { }
 
 public class WebRequestController : Singleton<WebRequestController>
