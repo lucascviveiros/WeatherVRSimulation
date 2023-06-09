@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using DigitalRuby.RainMaker;
 
 public class VirtualWeather : Singleton<VirtualWeather>
 {
@@ -18,12 +17,13 @@ public class VirtualWeather : Singleton<VirtualWeather>
 
     public void OnChangeWeatherReceiver(string currentWeather, int code, double wind, double radiation) {
      
-        Debug.Log("weaher: " + currentWeather + " code " + code + " Wind: " + wind);
+        //Debug.Log("weaher: " + currentWeather + " code " + code + " Wind: " + wind);
         //Wind control 
-        m_tree.SetFloat("_MotionSpeed", (float)wind / 3.3f);
+        m_tree.SetFloat("_MotionSpeed", (float)wind / 3.6f);
+
         //Sun Intensity based on radiation paremeter
         sun.intensity = (float)radiation * 0.00444f;
-        Debug.Log("sun: " + sun.intensity.ToString());
+        //Debug.Log("sun: " + sun.intensity.ToString());
 
         if (code == 0) //ceu limpo
         {
@@ -91,7 +91,7 @@ public class VirtualWeather : Singleton<VirtualWeather>
 
     public void WindSimulationSlider(float sliderValue)
     {
-        m_tree.SetFloat("_MotionSpeed", sliderValue);
+        m_tree.SetFloat("_MotionSpeed", sliderValue * 3);
+        //m_tree.SetFloat("_MotionRange", sliderValue * 2);
     }
-
 }

@@ -75,5 +75,5 @@ Assets/.DS_Store
 Assets/LargeFilesWeatherSimulation/.DS_Store
 Assets/LargeFilesWeatherSimulation
 Assets/MQTT/M2MqttUnity-master/
-Assets/Samples/XR Interaction Toolkit/2.3.0-pre.1/
 .DS_Store
+*.meta

@@ -14,7 +14,7 @@ public class UIManager : Singleton<UIManager>
     private TextMeshProUGUI t_Temperatura, t_Humidade, t_Tempo, t_Vento, t_Radiacao, t_TempSolo, t_HumSolo, t_SunSlider, t_RainSlider;
 
     private void Start()
-    {       
+    {
         //Initializing regions
         listRegion = new List<Region>();
         PopulateRegion();
@@ -33,25 +33,24 @@ public class UIManager : Singleton<UIManager>
         t_RainSlider.text = "";
 
         //Finding UI Dropdown in Canvas
-        m_Dropdown = GameObject.Find("UI/DropdownRegion").GetComponent<TMPro.TMP_Dropdown>(); 
+        m_Dropdown = GameObject.Find("UI/DropdownRegion").GetComponent<TMPro.TMP_Dropdown>();
         m_Dropdown.options.Clear();
 
         //Finding UI Slider in Canvas
         sl_sun = GameObject.Find("UI/SliderSun").GetComponent<Slider>();
         sl_rain = GameObject.Find("UI/SliderRain").GetComponent<Slider>();
-        //sl_wind = GameObject.Find("UI/SliderWind").GetComponent<Slider>();
+        sl_wind = GameObject.Find("UI/SliderWind").GetComponent<Slider>();
 
-        sl_sun.value = 0f;
-        sl_rain.value = 0f;
-        //sl_wind.value = 0f;
+        //Return Sliders to zero
+        ReturnSliders();
 
         //Adding regions in Dropdown UI
         foreach (Region option in listRegion)
         {
             m_Dropdown.options.Add(new TMPro.TMP_Dropdown.OptionData(option.Name));
-        }   
+        }
         //Creating Dropdown select event
-        m_Dropdown.onValueChanged.AddListener(delegate 
+        m_Dropdown.onValueChanged.AddListener(delegate
         {
             DropdownValueChanged(m_Dropdown);
         });
@@ -63,24 +62,30 @@ public class UIManager : Singleton<UIManager>
         sl_rain.onValueChanged.AddListener(delegate {
 
             ValueChangedSliderRain();
-    	});
-        /*
+        });
+        
         sl_wind.onValueChanged.AddListener(delegate {
 
             ValueChangedSliderWind();
-        }); */
-    } 
+        }); 
+    }
 
     private void PopulateRegion()
     {
-        listRegion.Add(new Region("41.80", "-6.77", "Bragança"));
-        listRegion.Add(new Region("41.10", "-7.14", "Vila Nova Foz Côa"));
-        listRegion.Add(new Region("41.07", "-7.13", "Salgueiro"));
-        listRegion.Add(new Region("41.02", "-7.13", "Muxagata"));
-        listRegion.Add(new Region("41.01", "-7.01", "Almendra"));
-        listRegion.Add(new Region("41.01", "-6.95", "Escalhão"));
-        listRegion.Add(new Region("37.01", "-7.93", "Faro"));
-        //listRegion.Add(new Region("-23.41", "-46.44", "São Paulo"));
+        listRegion.Add(new Region("-23.53", "-46.62", "São Paulo - BR"));
+
+        listRegion.Add(new Region("52.37", "4.89", "Amsterdam - NL"));
+
+        listRegion.Add(new Region("48.86", "2.34", "Paris - FR"));
+
+        listRegion.Add(new Region("38.72", "-9.13", "Lisbon - PT"));
+
+        //listRegion.Add(new Region("41.80", "-6.77", "Bragança"));
+        //listRegion.Add(new Region("41.10", "-7.14", "Vila Nova Foz Côa"));
+        //listRegion.Add(new Region("41.07", "-7.13", "Salgueiro"));
+        //listRegion.Add(new Region("41.02", "-7.13", "Muxagata"));
+        //listRegion.Add(new Region("41.01", "-7.01", "Almendra"));
+        //listRegion.Add(new Region("41.01", "-6.95", "Escalhão"));
     }
 
     public void RegionClick(string region)
@@ -91,8 +96,8 @@ public class UIManager : Singleton<UIManager>
     //Search the region clicked by the user in the dropdown list
     private void SearchWeather(string region)
     {
-        Region searchRegion = listRegion.Find( x => x.Name==region);
-        if(searchRegion == null){}
+        Region searchRegion = listRegion.Find(x => x.Name == region);
+        if (searchRegion == null) { }
         else
         {
             string lat = searchRegion.Latitude;
@@ -108,6 +113,13 @@ public class UIManager : Singleton<UIManager>
     {
         //Debug.Log("Option selected: " + m_Dropdown.options[m_Dropdown.value].text);
         SearchWeather(m_Dropdown.options[m_Dropdown.value].text);
+    }
+
+    public void ReturnSliders()
+    {
+        sl_sun.value = 0f;
+        sl_rain.value = 0f;
+        sl_wind.value = 0f;
     }
 
     //Used to update weather parameters in the UI Text in the Canvas from WebRequestController
@@ -136,12 +148,12 @@ public class UIManager : Singleton<UIManager>
         //Debug.Log("ValueChangedSliderSun: " + sliderRainValue);
         VirtualWeather.instance.RainSimulationSlider(sliderRainValue);
     }
-    /*
+    
     private void ValueChangedSliderWind()
     {
         float sliderWindValue = sl_wind.value * 3;
         //Debug.Log("ValueChangedSliderSun: " + sliderWindValue);
         if (sliderWindValue >= 1.5f)
             VirtualWeather.instance.WindSimulationSlider(sliderWindValue);
-    }*/
+    }
 }
