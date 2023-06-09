@@ -200,20 +200,35 @@ public class WebRequestController : Singleton<WebRequestController>
     /// </summary>
     /// <param name="uri">The URI of the API endpoint to request.</param>
     /// <returns>An IEnumerator used for coroutine execution.</returns>
+    ///
     private IEnumerator GetFromOpenMateoAPI(string uri)
     {
         UnityWebRequest www = UnityWebRequest.Get(uri);
-        yield return www.Send();
+        yield return www.SendWebRequest();
 
         if (www.isNetworkError)
         {
-            Debug.Log("Error while Receiving: " + www.error);
+            Debug.Log("Error while receiving: " + www.error);
         }
         else
         {
-            string result = www.downloadHandler.text;
-            myDeserializedClass = JsonConvert.DeserializeObject<OpenMateo.Root>(result);
-            GetValuesRequest();
+            if (!string.IsNullOrEmpty(www.downloadHandler.text))
+            {
+                try
+                {
+                    string result = www.downloadHandler.text;
+                    myDeserializedClass = JsonConvert.DeserializeObject<OpenMateo.Root>(result);
+                    GetValuesRequest();
+                }
+                catch (JsonException ex)
+                {
+                    Debug.Log("Error while deserializing JSON: " + ex.Message);
+                }
+            }
+            else
+            {
+                Debug.Log("Received empty response");
+            }
         }
     }
 }
